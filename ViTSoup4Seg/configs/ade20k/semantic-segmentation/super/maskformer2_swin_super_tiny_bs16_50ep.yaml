@@ -1,0 +1,183 @@
+_BASE_: ../Base-ADE20K-SemanticSegmentation.yaml
+MODE: "super"
+MODEL:
+  META_ARCHITECTURE: "SuperMaskFormer"
+  PRETRAIN_IMG_SIZE: 224
+  BACKBONE:
+    NAME: "SuperD2SwinTransformer"
+    PATCH_SIZE: 4
+    EMBED_DIM: 108
+    DEPTHS: [ 2, 2, 8, 2 ]
+    NUM_HEADS: [ 3, 6, 12, 24 ]
+    WINDOW_SIZE: 7
+    MLP_RATIO: 4.0
+    QKV_BIAS: True
+    QK_SCALE: null
+    DROP_RATE: 0.0
+    ATTN_DROP_RATE: 0.0
+    DROP_PATH_RATE: 0.3
+    ABS_POS: False
+    PATCH_NORM: True
+    USE_CHECKPOINT: False
+    SCALE: False
+    SHIFT: False
+    OUT_FEATURES: ["res2", "res3", "res4", "res5"]
+  SEM_SEG_HEAD:
+    NAME: "SuperMaskFormerHead"
+    PIXEL_DECODER_NAME: "SuperMSDeformAttnPixelDecoder"
+    IN_FEATURES: ["res2", "res3", "res4", "res5"]
+    CONVS_DIM: 256
+    MASK_DIM: 256
+    NORM: "GN"
+    PRE_NORM: False
+    ACT_LAYER: "relu"
+    TRANSFORMER_NORM: "LN"
+    ENC_N_POINTS: 4
+    DROPOUT: 0.0
+    ENC_N_HEADS: 8
+    ENC_MLP_RATIO: 4.0
+    ENC_DEPTHS: 6
+    ENC_IN_FEATURES: ["res3", "res4", "res5"]
+    SCALE: False
+    USE_CHECKPOINT: False
+    COMMON_STRIDE: 4
+    IGNORE_VALUE: 255
+    NUM_CLASSES: 150
+    LOSS_WEIGHT: 1.0
+  MASK_FORMER:
+    TRANSFORMER_DECODER_NAME: "SuperMultiScaleMaskedTransformerDecoder"
+    TRANSFORMER_IN_FEATURE: "multi_scale_pixel_decoder"
+    DEC_IN_FEATURES: ["res3", "res4", "res5"]
+    HIDDEN_DIM: 256
+    NUM_OBJECT_QUERIES: 100
+    DEC_N_HEADS: 8
+    DEC_MLP_RATIO: 8.0
+    DROPOUT: 0.0
+    DEC_DEPTHS: 10  # including for the loss on learnable query
+    ACT_LAYER: "relu"
+    PRE_NORM: False
+    NORM: "LN"
+    ENFORCE_INPUT_PROJ: True
+    SCALE: False
+    USE_CHECKPOINT: False
+    DEEP_SUPERVISION: True
+    NO_OBJECT_WEIGHT: 0.1
+    CLASS_WEIGHT: 2.0
+    MASK_WEIGHT: 5.0
+    DICE_WEIGHT: 5.0
+    SIZE_DIVISIBILITY: 32
+    TRAIN_NUM_POINTS: 12544
+    OVERSAMPLE_RATIO: 3.0
+    IMPORTANCE_SAMPLE_RATIO: 0.75
+    QKV_BIAS: False
+    QK_SCALE: null
+    CHANGE_QKV: True
+    TEST:
+      SEMANTIC_ON: True
+      INSTANCE_ON: False
+      PANOPTIC_ON: False
+      OVERLAP_THRESHOLD: 0.8
+      OBJECT_MASK_THRESHOLD: 0.8
+      SEM_SEG_POSTPROCESSING_BEFORE_INFERENCE: False
+SEARCH_SPACE:
+  BACKBONE:
+    IS_USED: true
+    EMBED_DIM: [ 84, 96, 108 ]
+    DEPTHS: [ [ 2 ], [ 2 ], [ 6, 7, 8 ], [ 2 ] ]
+    NUM_HEADS: [ [ 2, 3 ], [ 4, 6 ], [ 8, 12 ], [ 16, 24 ] ]
+    WINDOW_SIZE: [ 5, 7 ]
+    MLP_RATIO: [ 3.5, 4.0 ]
+  SEM_SEG_HEAD:
+    IS_USED: true
+    IN_FEATURES: ["res2", "res3", "res4", "res5"]
+    ENC_IN_FEATURES: [["res3", "res4", "res5"], ["res4", "res5"], ["res5"]]
+    CONVS_DIM: [192, 224, 256]
+    ENC_DEPTHS: [4, 5, 6]
+    ENC_N_POINTS: [3, 4]
+    ENC_N_HEADS: [6, 8]
+    ENC_MLP_RATIO: [3.5, 4.0]
+    MASK_DIM: [192, 224, 256]
+  MASK_FORMER:
+    IS_USED: true
+    DEC_IN_FEATURES: [["res3", "res4", "res5"], ["res4", "res5"], ["res5"]]
+    HIDDEN_DIM: [192, 224, 256]
+    DEC_DEPTHS: [8, 9, 10]
+    DEC_N_HEADS: [6, 8]
+    DEC_MLP_RATIO: [7.0, 8.0]
+SUBNET:
+  BACKBONE:
+    EMBED_DIM: 108
+    DEPTHS: [ 2, 2, 8, 2 ]
+    NUM_HEADS: [ 3, 3, 6, 6, 12, 12, 12, 12, 12, 12, 12, 12, 24, 24 ]
+    WINDOW_SIZE: [ 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 ]
+    MLP_RATIO: [ 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0 ]
+  SEM_SEG_HEAD:
+    IN_FEATURES: ["res2", "res3", "res4", "res5"]
+    ENC_IN_FEATURES: ["res3", "res4", "res5"]
+    CONVS_DIM: 256
+    ENC_DEPTHS: 6
+    ENC_N_HEADS: [8, 8, 8, 8, 8, 8]
+    ENC_N_POINTS: [4, 4, 4, 4, 4, 4]
+    ENC_MLP_RATIO: [4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+    MASK_DIM: 256
+  MASK_FORMER:
+    DEC_IN_FEATURES: ["res3", "res4", "res5"]
+    HIDDEN_DIM: 256
+    DEC_DEPTHS: 10
+    DEC_CROSS_N_HEADS: [8, 8, 8, 8, 8, 8, 8, 8, 8]
+    DEC_SELF_N_HEADS: [8, 8, 8, 8, 8, 8, 8, 8, 8]
+    DEC_FFN_MLP_RATIO: [8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0]
+    MULTI_SCALE_PER_LAYER: ["res5", "res4", "res3", "res5", "res4", "res3", "res5", "res4", "res3"]
+MIN_SUBNET:
+  BACKBONE:
+    EMBED_DIM: 84
+    DEPTHS: [ 2, 2, 6, 2 ]
+    NUM_HEADS: [ 2, 2, 4, 4, 8, 8, 8, 8, 8, 8, 16, 16 ]
+    WINDOW_SIZE: [ 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 ]
+    MLP_RATIO: [ 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5 ]
+  SEM_SEG_HEAD:
+    IN_FEATURES: ["res2", "res3", "res4", "res5"]
+    ENC_IN_FEATURES: ["res5"]
+    CONVS_DIM: 192
+    ENC_DEPTHS: 4
+    ENC_N_HEADS: [6, 6, 6, 6]
+    ENC_N_POINTS: [3, 3, 3, 3]
+    ENC_MLP_RATIO: [3.5, 3.5, 3.5, 3.5]
+    MASK_DIM: 192
+  MASK_FORMER:
+    DEC_IN_FEATURES: ["res5"]
+    HIDDEN_DIM: 192
+    DEC_DEPTHS: 8
+    DEC_CROSS_N_HEADS: [6, 6, 6, 6, 6, 6, 6]
+    DEC_SELF_N_HEADS: [6, 6, 6, 6, 6, 6, 6]
+    DEC_FFN_MLP_RATIO: [7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0]
+    MULTI_SCALE_PER_LAYER: ["res5", "res5", "res5", "res5", "res5", "res5", "res5"]
+MAX_SUBNET:
+  BACKBONE:
+    EMBED_DIM: 108
+    DEPTHS: [ 2, 2, 8, 2 ]
+    NUM_HEADS: [ 3, 3, 6, 6, 12, 12, 12, 12, 12, 12, 12, 12, 24, 24 ]
+    WINDOW_SIZE: [ 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 ]
+    MLP_RATIO: [ 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0 ]
+  SEM_SEG_HEAD:
+    IN_FEATURES: ["res2", "res3", "res4", "res5"]
+    ENC_IN_FEATURES: ["res3", "res4", "res5"]
+    CONVS_DIM: 256
+    ENC_DEPTHS: 6
+    ENC_N_HEADS: [8, 8, 8, 8, 8, 8]
+    ENC_N_POINTS: [4, 4, 4, 4, 4, 4]
+    ENC_MLP_RATIO: [4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+    MASK_DIM: 256
+  MASK_FORMER:
+    DEC_IN_FEATURES: ["res3", "res4", "res5"]
+    HIDDEN_DIM: 256
+    DEC_DEPTHS: 10
+    DEC_CROSS_N_HEADS: [8, 8, 8, 8, 8, 8, 8, 8, 8]
+    DEC_SELF_N_HEADS: [8, 8, 8, 8, 8, 8, 8, 8, 8]
+    DEC_FFN_MLP_RATIO: [8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0]
+    MULTI_SCALE_PER_LAYER: ["res5", "res4", "res3", "res5", "res4", "res3", "res5", "res4", "res3"]
+SOLVER:
+  MAX_ITER: 320000
+  CHECKPOINT_PERIOD: 10000
+TEST:
+  EVAL_PERIOD: 10000

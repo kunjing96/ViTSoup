@@ -1,0 +1,40 @@
+MODEL:
+  TYPE: super_swin
+  NAME: super_swin_tiny_patch4_window7_224
+  DROP_PATH_RATE: 0.2
+  SWIN:
+    EMBED_DIM: 108
+    DEPTHS: [ 2, 2, 8, 2 ]
+    NUM_HEADS: [ 3, 6, 12, 24 ]
+    WINDOW_SIZE: 7
+    MLP_RATIO: 4.0
+    SCALE: False
+    SHIFT: False
+TRAIN:
+  EPOCHS: 300
+  WARMUP_EPOCHS: 20
+MODE: subnet
+SUPER:
+  EMBED_DIM: [ 84, 96, 108 ]
+  DEPTHS: [ [ 2 ], [ 2 ], [ 6, 7, 8 ], [ 2 ] ]
+  NUM_HEADS: [ [ 2, 3 ], [ 4, 6 ], [ 8, 12 ], [ 16, 24 ] ]
+  WINDOW_SIZE: [ 5, 7 ]
+  MLP_RATIO: [ 3.5, 4.0 ]
+MIN_SUBNET:
+  EMBED_DIM: 84
+  DEPTHS: [ 2, 2, 6, 2 ]
+  NUM_HEADS: [ 2, 2, 4, 4, 8, 8, 8, 8, 8, 8, 16, 16 ]
+  WINDOW_SIZE: [ 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 ]
+  MLP_RATIO: [ 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5 ]
+MAX_SUBNET:
+  EMBED_DIM: 108
+  DEPTHS: [ 2, 2, 8, 2 ]
+  NUM_HEADS: [ 3, 3, 6, 6, 12, 12, 12, 12, 12, 12, 12, 12, 24, 24 ]
+  WINDOW_SIZE: [ 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 ]
+  MLP_RATIO: [ 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0 ]
+SUBNET:
+  EMBED_DIM: 96
+  DEPTHS: [ 2, 2, 8, 2 ]
+  NUM_HEADS: [ 2, 2, 6, 6, 12, 12, 8, 8, 12, 12, 8, 12, 16, 24 ]
+  WINDOW_SIZE: [ 5, 5, 7, 7, 5, 7, 7, 7, 7, 5, 7, 7, 7, 7 ]
+  MLP_RATIO: [ 3.5, 4.0, 4.0, 4.0, 3.5, 4.0, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 4.0, 4.0 ]
