@@ -15,7 +15,7 @@ We propose a once-for-all deployment paradigm designed to automatically generate
 
 
 ## Requirements and Dependencies
-All requirements and dependencies refer to these two repositories: [AutoFormer](https://github.com/ICCV2021/Autoformer) and [Mask2Former](https://github.com/facebookresearch/Mask2Former).
+All requirements and dependencies refer to these two repositories: SwinTransformer](https://github.com/microsoft/Swin-Transformer) and [Mask2Former](https://github.com/facebookresearch/Mask2Former).
 
 ## Reproducing Experiments
 Please refer to the README.md in each directory for details.
