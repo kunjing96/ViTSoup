@@ -18,7 +18,36 @@ We propose a once-for-all deployment paradigm designed to automatically generate
 All requirements and dependencies refer to these two repositories: SwinTransformer](https://github.com/microsoft/Swin-Transformer) and [Mask2Former](https://github.com/facebookresearch/Mask2Former).
 
 ## Reproducing Experiments
-Please refer to the README.md in each directory for details.
+
+Pretrain supernet for image classification
+'''
+cd ViTSoup
+python -m torch.distributed.launch --nproc_per_node 8 --master_port 12345  main.py --cfg configs/swin/super_swin_patch4_window7_224_no_shift_tiny.yaml --data-path <imagenet-path> --batch-size 128 
+'''
+
+Search subnet for image classification
+'''
+cd ViTSoup
+python evolution.py --cfg configs/swin/swin_small_patch4_window7_224.yaml --data-path <imagenet-path> --batch-size 128 
+'''
+
+Finetune supernet for image segmentation
+'''
+cd ViTSoup4Seg
+python train_net.py --num-gpus 8 --config-file configs/xxx/xxx/super/maskformer2_R50_bs16_50ep.yaml
+'''
+
+Search subnet for image segmentation
+'''
+cd ViTSoup4Seg
+python evolution.py --cfg configs/xxx/xxx/super/maskformer2_R50_bs16_50ep.yaml
+'''
+
+Evaluate subnet for image segmentation
+'''
+cd ViTSoup4Seg
+python evolution.py --cfg configs/xxx/xxx/subnet/maskformer2_R50_bs16_50ep.yaml  --eval-only MODEL.WEIGHTS /path/to/checkpoint_file
+'''
 
 ## Manuscript Affiliation
 This repository contains the official implementation for the manuscript submitted to [*The Visual Computer*](https://link.springer.com/journal/371).
