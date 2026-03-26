@@ -18,7 +18,7 @@ We propose a once-for-all deployment paradigm designed to automatically generate
 All requirements and dependencies refer to these two repositories: [AutoFormer](https://github.com/ICCV2021/Autoformer) and [Mask2Former](https://github.com/facebookresearch/Mask2Former).
 
 ## Reproducing Experiments
-TODO
+Please refer to the README.md in each directory for details.
 
 ## Manuscript Affiliation
 This repository contains the official implementation for the manuscript submitted to [*The Visual Computer*](https://link.springer.com/journal/371).
